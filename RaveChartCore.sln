@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateHash", "GenerateHas
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaveCalcApiCommander", "RaveCalcApiCommander\RaveCalcApiCommander.csproj", "{9C955724-148B-4425-8121-67BF10A3785C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaveChartLibrary", "RaveChartLibrary\RaveChartLibrary.csproj", "{813FE9F7-96BC-41F7-B186-9D0B24546225}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{9C955724-148B-4425-8121-67BF10A3785C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C955724-148B-4425-8121-67BF10A3785C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C955724-148B-4425-8121-67BF10A3785C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{813FE9F7-96BC-41F7-B186-9D0B24546225}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{813FE9F7-96BC-41F7-B186-9D0B24546225}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{813FE9F7-96BC-41F7-B186-9D0B24546225}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{813FE9F7-96BC-41F7-B186-9D0B24546225}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

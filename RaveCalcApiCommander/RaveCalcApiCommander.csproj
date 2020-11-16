@@ -22,5 +22,9 @@
     <Folder Include="Authorization\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RaveChartLibrary\RaveChartLibrary.csproj" />
+  </ItemGroup>
+
 
 </Project>
