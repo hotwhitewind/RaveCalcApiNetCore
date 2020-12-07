@@ -1,3 +1,6 @@
 [submodule "RaveChartLibrary"]
 	path = RaveChartLibrary
 	url = https://github.com/hotwhitewind/RaveChartLibrary.git
+[submodule "TimeZoneCorrectorLibrary"]
+	path = TimeZoneCorrectorLibrary
+	url = git@github.com:hotwhitewind/TimeZoneCorrectorLibrary.git
