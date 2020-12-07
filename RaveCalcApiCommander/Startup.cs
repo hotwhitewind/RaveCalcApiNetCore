@@ -48,7 +48,7 @@ namespace RaveCalcApiCommander
             services.AddTransient<IAuthorizationHandler, AuthHandler>();
             services.AddSingleton<IEmbededResourceService, MocEmbededResourceService>();
             services.AddHttpContextAccessor();
-            services.AddControllers().AddNewtonsoftJson();
+            services.AddControllers();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
