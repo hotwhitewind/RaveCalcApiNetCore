@@ -1,4 +1,5 @@
 using System.Text;
+using Autofac;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -12,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using RaveCalcApiCommander.Authorization;
 using RaveCalcApiCommander.Data;
 using RaveCalcApiCommander.GlobalErrorHandling;
+using TimeZoneCorrectorLibrary;
 
 namespace RaveCalcApiCommander
 {
@@ -23,6 +25,9 @@ namespace RaveCalcApiCommander
         }
 
         public IConfiguration Configuration { get; }
+
+       
+        public ILifetimeScope AutofacContainer { get; private set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -44,6 +49,18 @@ namespace RaveCalcApiCommander
             services.AddSingleton<IEmbededResourceService, MocEmbededResourceService>();
             services.AddHttpContextAccessor();
             services.AddControllers().AddNewtonsoftJson();
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            // Register your own things directly with Autofac here. Don't
+            // call builder.Populate(), that happens in AutofacServiceProviderFactory
+            // for you.
+            builder.RegisterModule(new DIModule()
+            {
+                ConnectionStringConfig = Configuration["MongoDBConfig:ConnectionString"],
+                DatabseNameConfig = Configuration["MongoDBConfig:DatabaseName"]
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

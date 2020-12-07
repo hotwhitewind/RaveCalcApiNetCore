@@ -4,15 +4,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Threading.Tasks;
+using ConvertGeoNamesDBToMongoDB.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RaveCalcApiCommander.Data;
 using RaveCalcApiCommander.Models;
 using Stratogos.Jovian.Rave.Charts;
 using Stratogos.Jovian.Rave.Structures;
+using TimeZoneCorrectorLibrary.Abstraction;
 
 namespace RaveCalcApiCommander.Controllers
 {
@@ -24,12 +29,184 @@ namespace RaveCalcApiCommander.Controllers
         private readonly ILogger<RaveController> _logger;
         private readonly IRaveRepository _raveRepo;
         private readonly IConfiguration _config;
+        private readonly ITimeZoneCorrector _timeZoneCorrector;
 
-        public RaveController(ILogger<RaveController> logger, IRaveRepository raveRepo, IConfiguration config)
+        public RaveController(ILogger<RaveController> logger, IRaveRepository raveRepo, IConfiguration config,
+            ITimeZoneCorrector timeZoneCorrector)
         {
             _logger = logger;
             _raveRepo = raveRepo;
             _config = config;
+            _timeZoneCorrector = timeZoneCorrector;
+        }
+
+        [HttpGet]
+        [Route("getallcountries")]
+        public ActionResult GetAllCountriesName()
+        {
+            var countries = _timeZoneCorrector.GetAllCountries();
+            if(countries == null)
+            {
+                return BadRequest(new ResponseError
+                {
+                    error = true,
+                    message = "Countries not found"
+                });
+            }
+            return Ok(new ResponseResult<List<string>>()
+            {
+                error = false,
+                result = countries
+            });
+        }
+
+        [HttpGet]
+        [Route("getallstates")]
+        public ActionResult GetAllStatesByCountryName([FromQuery] StatesQuery query)
+        {
+            if(query.countryName == null)
+            {
+                ModelState.AddModelError("countryName", "Отсутствует значение параметра");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ResponseError
+                {
+                    error = true,
+                    message = GetModelStateError()
+                });
+            }
+            var states = _timeZoneCorrector.GetAllStateByCountry(query.countryName);
+            if (states == null)
+            {
+                return BadRequest(new ResponseError
+                {
+                    error = true,
+                    message = "States not found"
+                });
+            }
+            return Ok(new ResponseResult<List<string>>()
+            {
+                error = false,
+                result = states
+            });
+        }
+
+        [HttpGet]
+        [Route("getallcities")]
+        public ActionResult GetAllCitiesByCountryAndStateName([FromQuery] CitiesQuery query)
+        {
+            if (query.countryName == null)
+            {
+                ModelState.AddModelError("countryName", "Отсутствует значение параметра");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ResponseError
+                {
+                    error = true,
+                    message = GetModelStateError()
+                });
+            }
+            var cities = _timeZoneCorrector.GetAllCitiesByState(query.countryName, query.stateName);
+            if (cities == null)
+            {
+                return BadRequest(new ResponseError
+                {
+                    error = true,
+                    message = "Cities not found"
+                });
+            }
+            return Ok(new ResponseResult<List<string>>()
+            {
+                error = false,
+                result = cities
+            });
+        }
+
+        [HttpGet]
+        [Route("getcity")]
+        public ActionResult GetCityByCountryStateAndCityName([FromQuery] CityQuery query)
+        {
+            if (query.countryName == null)
+            {
+                ModelState.AddModelError("countryName", "Отсутствует значение параметра");
+            }
+            if(query.cityName == null)
+            {
+                ModelState.AddModelError("cityName", "Отсутствует значение параметра");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ResponseError
+                {
+                    error = true,
+                    message = GetModelStateError()
+                });
+            }
+            var city = _timeZoneCorrector.GetCityByCountryAndState(query.countryName, query.stateName, 
+                query.cityName);
+            if (city == null)
+            {
+                return BadRequest(new ResponseError
+                {
+                    error = true,
+                    message = "City not found"
+                });
+            }
+
+            return Ok(new ResponseResult<City>()
+            {
+                error = false,
+                result = city
+            });
+        }
+
+        [HttpGet]
+        [Route("utcdatabytz")]
+        public ActionResult GetUTCDataTimeByTimeZone([FromQuery] DataQuery query)
+        {
+            if (query.timeZoneName == null)
+            {
+                ModelState.AddModelError("timeZoneName", "Отсутствует значение параметра");
+            }
+            if (query.date == null)
+            {
+                ModelState.AddModelError("date", "Отсутствует значение параметра");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ResponseError
+                {
+                    error = true,
+                    message = GetModelStateError()
+                });
+            }
+
+            DateTime dateFormat;
+            if (!DateTime.TryParse(query.date, null, System.Globalization.DateTimeStyles.RoundtripKind, out dateFormat))
+            {
+                ModelState.AddModelError("date", "Недопустимый формат даты");
+            }
+            try
+            {
+                var utcDate = _timeZoneCorrector.ConvertToUtcFromCustomTimeZone(query.timeZoneName, dateFormat);
+                return Ok(new ResponseResult<DateTime>()
+                {
+                    error = false,
+                    result = utcDate
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseError
+                {
+                    error = true,
+                    message = "Date not converted"
+                });
+            }
         }
 
         //2020-03-05T12:01:41
@@ -66,6 +243,7 @@ namespace RaveCalcApiCommander.Controllers
             });
 
         }
+
 
         [HttpGet]
         [Route("rave-circlechart")]

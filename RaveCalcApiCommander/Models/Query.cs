@@ -45,4 +45,32 @@ namespace RaveCalcApiCommander.Models
         public string birthdate5 { get; set; }
 
     }
+
+    public class StatesQuery
+    {
+        public string auth { get; set; }
+        public string countryName { get; set; }
+    }
+
+    public class CitiesQuery
+    {
+        public string auth { get; set; }
+        public string countryName { get; set; }
+        public string stateName { get; set; }
+    }
+
+    public class CityQuery
+    {
+        public string auth { get; set; }
+        public string countryName { get; set; }
+        public string stateName { get; set; }
+        public string cityName { get; set; }
+    }
+
+    public class DataQuery
+    {
+        public string auth { get; set; }
+        public string timeZoneName { get; set; }
+        public string date { get; set; }
+    }
 }
