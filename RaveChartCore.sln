@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaveCalcApiCommander", "Rav
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaveChartLibrary", "RaveChartLibrary\RaveChartLibrary.csproj", "{813FE9F7-96BC-41F7-B186-9D0B24546225}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeZoneCorrectorLibrary", "TimeZoneCorrectorLibrary\TimeZoneCorrectorLibrary\TimeZoneCorrectorLibrary.csproj", "{98BE92E3-1EF6-4FFA-A0DF-FB02F6AA0EA4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeZoneUnitTest", "TimeZoneCorrectorLibrary\TimeZoneUnitTest\TimeZoneUnitTest.csproj", "{A933B3E6-8056-4AA2-BA47-E4FB57604BDE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{813FE9F7-96BC-41F7-B186-9D0B24546225}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{813FE9F7-96BC-41F7-B186-9D0B24546225}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{813FE9F7-96BC-41F7-B186-9D0B24546225}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98BE92E3-1EF6-4FFA-A0DF-FB02F6AA0EA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98BE92E3-1EF6-4FFA-A0DF-FB02F6AA0EA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98BE92E3-1EF6-4FFA-A0DF-FB02F6AA0EA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98BE92E3-1EF6-4FFA-A0DF-FB02F6AA0EA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A933B3E6-8056-4AA2-BA47-E4FB57604BDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A933B3E6-8056-4AA2-BA47-E4FB57604BDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A933B3E6-8056-4AA2-BA47-E4FB57604BDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A933B3E6-8056-4AA2-BA47-E4FB57604BDE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
