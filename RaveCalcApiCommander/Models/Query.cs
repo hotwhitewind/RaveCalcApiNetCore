@@ -11,12 +11,14 @@ namespace RaveCalcApiCommander.Models
     {
         public string auth { get; set; }
         public string birthdate { get; set; }
+        public CityQuery city { get; set; }
     }
 
     public class CycleQuery
     {
         public string auth { get; set; }
         public string birthdate { get; set; }
+        public CityQuery city { get; set; }
         public string cycledate { get; set; }
         public string cycletype { get; set; }
     }
@@ -25,25 +27,18 @@ namespace RaveCalcApiCommander.Models
     {
         public string auth { get; set; }
         public string birthdate { get; set; }
+        public CityQuery city { get; set; }
         public string transitdate { get; set; }
     }
 
     public class ConnectionQuery
     {
-        public string auth { get; set; }
-        public string birthdate1 { get; set; }
-        public string birthdate2 { get; set; }
+        public IList<Query> birthdates { get; set; }
     }
 
     public class PentaQuery
     {
-        public string auth { get; set; }
-        public string birthdate1 { get; set; }
-        public string birthdate2 { get; set; }
-        public string birthdate3 { get; set; }
-        public string birthdate4 { get; set; }
-        public string birthdate5 { get; set; }
-
+        public IList<Query> birthdates { get; set; }
     }
 
     public class StatesQuery

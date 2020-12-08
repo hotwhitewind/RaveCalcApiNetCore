@@ -58,7 +58,7 @@ namespace RaveCalcApiCommander.Data
             return cycleChart;
         }
 
-        public PentaModel GetPentaModelInJson(ArrayList birthdates)
+        public PentaModel GetPentaModelInJson(List<DateTime> birthdates)
         {
             ArrayList raveList = new ArrayList();
             foreach (var date in birthdates)

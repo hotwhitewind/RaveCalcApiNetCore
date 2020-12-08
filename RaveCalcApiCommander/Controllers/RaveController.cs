@@ -212,15 +212,10 @@ namespace RaveCalcApiCommander.Controllers
             {
                 ModelState.AddModelError("birthdate", "Отсутствует значение параметра");
             }
-            DateTime birthDate;
-            if (!DateTime.TryParse(query.birthdate, null, System.Globalization.DateTimeStyles.RoundtripKind, out birthDate))
-            {
-                ModelState.AddModelError("birthdate", "Недопустимый формат даты");
-            }
-            else if (birthDate.Year < 1200)
-            {
-                ModelState.AddModelError("birthdate", "Год должен быть больше 1200");
-            }
+
+            CheckDateParam(query.birthdate, "birthdate", out DateTime birthDate);
+            CheckCityParam(query.city, null);
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ResponseError
@@ -228,6 +223,26 @@ namespace RaveCalcApiCommander.Controllers
                     error = true,
                     message = GetModelStateError()
                 });
+            }
+            if (query.city != null)
+            {
+                int res = ConvertDate(query.city, birthDate, out birthDate);
+                if (res == -1)
+                {
+                    return BadRequest(new ResponseError
+                    {
+                        error = true,
+                        message = "City not found"
+                    });
+                }
+                if (res == -2)
+                {
+                    return BadRequest(new ResponseError
+                    {
+                        error = true,
+                        message = "Date not converted"
+                    });
+                }
             }
             var rave =_raveRepo.GetRaveChartInJson(birthDate) as AdvancedImagingChart;
             return Ok(new ResponseResult<object>()
@@ -237,7 +252,6 @@ namespace RaveCalcApiCommander.Controllers
             });
 
         }
-
 
         [HttpGet]
         [Route("rave-circlechart")]
@@ -252,28 +266,15 @@ namespace RaveCalcApiCommander.Controllers
                 ModelState.AddModelError("cycledate", "Отсутствует значение параметра");
             }
 
-            if (!DateTime.TryParse(query.birthdate, null, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime birthDate))
-            {
-                ModelState.AddModelError("birthdate", "Недопустимый формат даты");
-            }
-            else if (birthDate.Year < 1200)
-            {
-                ModelState.AddModelError("birthdate", "Год должен быть больше 1200");
-            }
-
-            if (!DateTime.TryParse(query.cycledate, null, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime cycleDate))
-            {
-                ModelState.AddModelError("cycledate", "Недопустимый формат даты");
-            }
-            else if (cycleDate.Year < 1200)
-            {
-                ModelState.AddModelError("cycleDate", "Год должен быть больше 1200");
-            }
+            CheckDateParam(query.birthdate, "birthdate", out DateTime birthDate);
+            CheckDateParam(query.cycledate, "cycledate", out DateTime cycleDate);
 
             if (!Enum.TryParse(query.cycletype, out HdStructures.Cycle cycleType))
             {
                 ModelState.AddModelError("cycletype", "Недопустимый формат типа цикла");
             }
+
+            CheckCityParam(query.city, null);
 
             if (!ModelState.IsValid)
             {
@@ -282,6 +283,26 @@ namespace RaveCalcApiCommander.Controllers
                     error = true,
                     message = GetModelStateError()
                 });
+            }
+            if (query.city != null)
+            {
+                int res = ConvertDate(query.city, birthDate, out birthDate);
+                if (res == -1)
+                {
+                    return BadRequest(new ResponseError
+                    {
+                        error = true,
+                        message = "City not found"
+                    });
+                }
+                if (res == -2)
+                {
+                    return BadRequest(new ResponseError
+                    {
+                        error = true,
+                        message = "Date not converted"
+                    });
+                }
             }
             var rave = _raveRepo.GetCycleChartInJson(birthDate, cycleDate, cycleType );
             return Ok(new ResponseResult<object>()
@@ -304,23 +325,12 @@ namespace RaveCalcApiCommander.Controllers
                 ModelState.AddModelError("transitdate", "Отсутствует значение параметра");
             }
 
-            if (!DateTime.TryParse(query.birthdate, null, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime birthDate))
-            {
-                ModelState.AddModelError("birthdate", "Недопустимый формат даты");
-            }
-            else if (birthDate.Year < 1200)
-            {
-                ModelState.AddModelError("birthdate", "Год должен быть больше 1200");
-            }
+            CheckDateParam(query.birthdate, "birthdate", out DateTime birthDate);
 
-            if (!DateTime.TryParse(query.transitdate, null, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime transitDate))
-            {
-                ModelState.AddModelError("transitdate", "Недопустимый формат даты");
-            }
-            else if (transitDate.Year < 1200)
-            {
-                ModelState.AddModelError("transitDate", "Год должен быть больше 1200");
-            }
+            CheckDateParam(query.birthdate, "transitDate", out DateTime transitDate);
+
+            CheckCityParam(query.city, null);
+
 
             if (!ModelState.IsValid)
             {
@@ -330,6 +340,27 @@ namespace RaveCalcApiCommander.Controllers
                     message = GetModelStateError()
                 });
             }
+            if (query.city != null)
+            {
+                int res = ConvertDate(query.city, birthDate, out birthDate);
+                if (res == -1)
+                {
+                    return BadRequest(new ResponseError
+                    {
+                        error = true,
+                        message = "City not found"
+                    });
+                }
+                if (res == -2)
+                {
+                    return BadRequest(new ResponseError
+                    {
+                        error = true,
+                        message = "Date not converted"
+                    });
+                }
+            }
+            
             var rave = _raveRepo.GetTransitChartInJson(birthDate, transitDate);
             return Ok(new ResponseResult<object>()
             {
@@ -342,31 +373,22 @@ namespace RaveCalcApiCommander.Controllers
         [Route("rave-connectionchart")]
         public ActionResult GetRaveConnectionChartJson([FromQuery]ConnectionQuery query)
         {
-            if (query.birthdate1 == null)
+            List<DateTime> birthdates = new List<DateTime>();
+
+            if(query.birthdates.Count != 2)
             {
-                ModelState.AddModelError("birthdate1", "Отсутствует значение параметра");
-            }
-            if (query.birthdate2 == null)
-            {
-                ModelState.AddModelError("birthdate2", "Отсутствует значение параметра");
+                ModelState.AddModelError("birthdates", "Необходимо два параметра даты рождения");
             }
 
-            if (!DateTime.TryParse(query.birthdate1, null, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime birthDate1))
+            for (int i = 0; i < query.birthdates.Count; i++)
             {
-                ModelState.AddModelError("birthdate1", "Недопустимый формат даты");
-            }
-            else if (birthDate1.Year < 1200)
-            {
-                ModelState.AddModelError("birthdate1", "Год должен быть больше 1200");
-            }
-
-            if (!DateTime.TryParse(query.birthdate2, null, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime birthDate2))
-            {
-                ModelState.AddModelError("birthdate2", "Недопустимый формат даты");
-            }
-            else if (birthDate2.Year < 1200)
-            {
-                ModelState.AddModelError("birthdate1", "Год должен быть больше 1200");
+                Query birthdate = query.birthdates[i];
+                if (birthdate != null)
+                {
+                    CheckDateParam(birthdate.birthdate, $"{i + 1}", out DateTime birthDate);
+                    birthdates.Add(birthDate);
+                }
+                CheckCityParam(birthdate.city, i + 1);
             }
 
             if (!ModelState.IsValid)
@@ -377,7 +399,35 @@ namespace RaveCalcApiCommander.Controllers
                     message = GetModelStateError()
                 });
             }
-            var rave = _raveRepo.GetConnectionChartInJson(birthDate1, birthDate2);
+
+            for (int i = 0; i < query.birthdates.Count; i++)
+            {
+                Query birthdate = query.birthdates[i];
+                if (birthdate.city != null)
+                {
+                    int res = ConvertDate(birthdate.city, birthdates[i], out DateTime convbirthdate);
+
+                    if (res == -1)
+                    {
+                        return BadRequest(new ResponseError
+                        {
+                            error = true,
+                            message = $"City{i + 1} not found"
+                        });
+                    }
+                    if (res == -2)
+                    {
+                        return BadRequest(new ResponseError
+                        {
+                            error = true,
+                            message = $"Date{i + 1} not converted"
+                        });
+                    }
+                    birthdates[i] = convbirthdate;
+                }
+            }
+
+            var rave = _raveRepo.GetConnectionChartInJson(birthdates[0], birthdates[1]);
             return Ok(new ResponseResult<object>()
             {
                 error = false,
@@ -389,91 +439,33 @@ namespace RaveCalcApiCommander.Controllers
         [Route("rave-pentamodel")]
         public ActionResult GetRavePentaModelJson([FromQuery]PentaQuery query)
         {
-            ArrayList birthdates = new ArrayList();
-            DateTime birthDate;
-            if (query.birthdate1 == null)
+            List<DateTime> birthdates = new List<DateTime>();
+            if (query.birthdates == null)
             {
-                ModelState.AddModelError("birthdate1", "Отсутствует значение параметра");
-            }
-            if (query.birthdate2 == null)
-            {
-                ModelState.AddModelError("birthdate2", "Отсутствует значение параметра");
-            }
-            if (query.birthdate3 == null)
-            {
-                ModelState.AddModelError("birthdate3", "Отсутствует значение параметра");
+                ModelState.AddModelError("birthdates", "Отсутствует значение параметра");
             }
 
-            if (query.birthdate1 != null)
+            if(query.birthdates.Count < 3)
             {
-                if (!DateTime.TryParse(query.birthdate1, null, System.Globalization.DateTimeStyles.RoundtripKind, out birthDate))
-                {
-                    ModelState.AddModelError("birthdate1", "Недопустимый формат даты");
-                }
-                else if (birthDate.Year < 1200)
-                {
-                    ModelState.AddModelError("birthdate1", "Год должен быть больше 1200");
-                }
-                birthdates.Add(birthDate);
+                ModelState.AddModelError("birthdates", "Минимальное количество параметров равно 3");
             }
 
-            if (query.birthdate2 != null)
+            if(query.birthdates.Count > 5)
             {
-                if (!DateTime.TryParse(query.birthdate2, null, System.Globalization.DateTimeStyles.RoundtripKind, out birthDate))
-                {
-                    ModelState.AddModelError("birthdate2", "Недопустимый формат даты");
-                }
-                else if (birthDate.Year < 1200)
-                {
-                    ModelState.AddModelError("birthdate2", "Год должен быть больше 1200");
-                }
-
-                birthdates.Add(birthDate);
-            }
-            if (query.birthdate3 != null)
-            {
-                if (!DateTime.TryParse(query.birthdate3, null, System.Globalization.DateTimeStyles.RoundtripKind, out birthDate))
-                {
-                    ModelState.AddModelError("birthdate3", "Недопустимый формат даты");
-                }
-                else if (birthDate.Year < 1200)
-                {
-                    ModelState.AddModelError("birthdate3", "Год должен быть больше 1200");
-                }
-
-                birthdates.Add(birthDate);
-            }
-            if (query.birthdate4 != null)
-            {
-                if (!DateTime.TryParse(query.birthdate4, null, System.Globalization.DateTimeStyles.RoundtripKind, out birthDate))
-                {
-                    ModelState.AddModelError("birthdate4", "Недопустимый формат даты");
-                }
-                else if (birthDate.Year < 1200)
-                {
-                    ModelState.AddModelError("birthdate4", "Год должен быть больше 1200");
-                }
-
-                birthdates.Add(birthDate);
-            }
-            if (query.birthdate5 != null)
-            {
-                if (!DateTime.TryParse(query.birthdate5, null, System.Globalization.DateTimeStyles.RoundtripKind, out birthDate))
-                {
-                    ModelState.AddModelError("birthdate5", "Недопустимый формат даты");
-                }
-                else if (birthDate.Year < 1200)
-                {
-                    ModelState.AddModelError("birthdate5", "Год должен быть больше 1200");
-                }
-
-                birthdates.Add(birthDate);
+                ModelState.AddModelError("birthdates", "Максимальное количество параметров равно 5");
             }
 
-            if (birthdates.Count < 3)
+            for(int i = 0; i < query.birthdates.Count; i++)
             {
-                ModelState.AddModelError("birthdates", "Должно быть минимум три даты рождения");
+                Query birthdate = query.birthdates[i];
+                if (birthdate != null)
+                {
+                    CheckDateParam(birthdate.birthdate, $"{i + 1}", out DateTime birthDate);
+                    birthdates.Add(birthDate);
+                }
+                CheckCityParam(birthdate.city, i + 1);
             }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ResponseError
@@ -482,12 +474,103 @@ namespace RaveCalcApiCommander.Controllers
                     message = GetModelStateError()
                 });
             }
+
+            for(int i = 0; i < query.birthdates.Count; i++) 
+            {
+                Query birthdate = query.birthdates[i];
+                if (birthdate.city != null)
+                {
+                    int res = ConvertDate(birthdate.city, birthdates[i], out DateTime convbirthdate);
+
+                    if (res == -1)
+                    {
+                        return BadRequest(new ResponseError
+                        {
+                            error = true,
+                            message = $"City{i + 1} not found"
+                        });
+                    }
+                    if (res == -2)
+                    {
+                        return BadRequest(new ResponseError
+                        {
+                            error = true,
+                            message = $"Date{i + 1} not converted"
+                        });
+                    }
+                    birthdates[i] = convbirthdate;
+                }
+            }
             var rave = _raveRepo.GetPentaModelInJson(birthdates);
             return Ok(new ResponseResult<object>()
             {
                 error = false,
                 result = rave
             });
+        }
+
+        private void CheckDateParam(string dateParam, string dateParamName, out DateTime dateOut)
+        {
+            if (!DateTime.TryParse(dateParam, null, System.Globalization.DateTimeStyles.RoundtripKind, out dateOut))
+            {
+                ModelState.AddModelError(dateParamName, "Недопустимый формат даты");
+            }
+            else if (dateOut.Year < 1200)
+            {
+                ModelState.AddModelError(dateParamName, "Год должен быть больше 1200");
+
+            }
+        }
+
+        private int ConvertDate(CityQuery city, DateTime inDateTime, out DateTime outDateTime)
+        {
+            outDateTime = inDateTime;
+            if (city == null)
+                return 0;
+            if (city.cityName != null)
+            {
+                var cityRes = _timeZoneCorrector.GetCityByCountryAndState(city.countryName, city.stateName, city.cityName);
+                if (cityRes == null)
+                {
+                    return -1;
+                }
+                try
+                {
+                    outDateTime = _timeZoneCorrector.ConvertToUtcFromCustomTimeZone(cityRes.TimeZone, (DateTime)inDateTime);
+                }
+                catch (Exception ex)
+                {
+                    return -2;
+                }
+                return 0;
+            }
+            return -1;
+        }
+
+        private void CheckCityParam(CityQuery param, int? paramId)
+        {
+            if (param == null)
+                return;
+            if (param.cityName != null)
+            {
+                if (param.countryName == null)
+                {
+                    if(paramId.HasValue)
+                        ModelState.AddModelError($"countryName{paramId.Value}", "Отсутствует значение параметра");
+                    else
+                        ModelState.AddModelError($"countryName", "Отсутствует значение параметра");
+                }
+            }
+            if (param.countryName != null)
+            {
+                if (param.cityName == null)
+                {
+                    if(paramId.HasValue)
+                        ModelState.AddModelError($"cityName{paramId.Value}", "Отсутствует значение параметра");
+                    else
+                        ModelState.AddModelError($"cityName", "Отсутствует значение параметра");
+                }
+            }
         }
 
         public string GetModelStateError()
