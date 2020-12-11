@@ -1,0 +1,50 @@
+<div class="content-wrapper">
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0 text-dark">Пример рассчета Rave</h1>
+        </div><!-- /.col -->
+      </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </div>
+
+  <div class="content">
+    <div class="row">
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-body login-card-body">
+            <p class="login-box-msg">Введите данные</p>
+            <form [formGroup]="dataForm" (ngSubmit)="onSubmit(dataForm)">
+              <div class="form-group">
+                <input formControlName="country" class="form-control" type="text" placeholder="Страна" />
+              </div>
+              <div class="form-group">
+                <input formControlName="state" class="form-control" type="text" placeholder="Область" />
+              </div>
+              <div class="form-group">
+                <input formControlName="city" class="form-control" type="text" placeholder="Город" />
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <input formControlName="birthdate" class="form-control" placeholder="dd-mm-yyyy" name="dp"
+                    ngbDatepicker #d="ngbDatepicker" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary calendar" (click)="d.toggle()" type="button"></button>
+                  </div>
+                </div>
+              </div>
+              <div class="label">Время рождения</div>
+              <div class="form-froup">
+                <ngb-timepicker formControlName="birthtime"></ngb-timepicker>
+              </div>
+              <div class="form-group">
+                <input type="submit" value="Рассчитать" class="btn btn-outline-dark" />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
