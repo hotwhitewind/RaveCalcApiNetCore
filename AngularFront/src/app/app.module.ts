@@ -6,12 +6,16 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { UserdateComponent } from './userdate/userdate.component';
+import { UserdateComponent } from './components/userdate/userdate.component';
+import { AlertComponent } from './components/dialogs/alert/alert.component';
+import { ErrorListComponent } from './components/dialogs/error-list/error-list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    UserdateComponent
+    UserdateComponent,
+    AlertComponent,
+    ErrorListComponent
   ],
   imports: [
     BrowserModule,
