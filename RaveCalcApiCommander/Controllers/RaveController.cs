@@ -195,6 +195,8 @@ namespace RaveCalcApiCommander.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error converting date");
+
                 return BadRequest(new ResponseError
                 {
                     error = true,
@@ -250,7 +252,6 @@ namespace RaveCalcApiCommander.Controllers
                 error = false,
                 result = rave
             });
-
         }
 
         [HttpGet]

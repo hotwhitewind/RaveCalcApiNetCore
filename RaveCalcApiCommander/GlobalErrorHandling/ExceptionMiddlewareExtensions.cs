@@ -43,7 +43,13 @@ namespace RaveCalcApiCommander.GlobalErrorHandling
             context.Response.ContentType = "application/json";
             if (exception is HttpStatusCodeException)
             {
-                _logger.LogError(exception.Message);
+                _logger.LogError(exception, $"{exception.Message}\n Trace:{exception.StackTrace}");
+                var innerException = exception.InnerException;
+                while (innerException != null)
+                {
+                    _logger.LogError(innerException, $"{innerException.Message} \n Trace:{innerException.StackTrace}");
+                    innerException = innerException.InnerException;
+                }
                 result = new ResponseError
                 {
                     error = true,
@@ -53,7 +59,13 @@ namespace RaveCalcApiCommander.GlobalErrorHandling
             }
             else
             {
-                _logger.LogError("Runtime Error");
+                _logger.LogError(exception, $"{exception.Message}\n Trace:{exception.StackTrace}");
+                var innerException = exception.InnerException;
+                while (innerException != null)
+                {
+                    _logger.LogError(innerException, $"{innerException.Message} \n Trace:{innerException.StackTrace}");
+                    innerException = innerException.InnerException;
+                }
 
                 result = new ResponseError
                 {
@@ -68,7 +80,13 @@ namespace RaveCalcApiCommander.GlobalErrorHandling
 
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            _logger.LogError(exception.Message);
+            _logger.LogError(exception, $"{exception.Message}\n Trace:{exception.StackTrace}");
+            var innerException = exception.InnerException;
+            while (innerException != null)
+            {
+                _logger.LogError(innerException, $"{innerException.Message} \n Trace:{innerException.StackTrace}");
+                innerException = innerException.InnerException;
+            }
             string result = new ResponseError
             {
                 error = true,
