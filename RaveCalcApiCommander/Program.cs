@@ -23,7 +23,7 @@ namespace RaveCalcApiCommander
                 {
                     logging.ClearProviders();
                     logging.AddConsole();
-                    logging.AddFile("Log/log_{Date}.txt", LogLevel.Error);
+                    logging.AddFile($"{AppContext.BaseDirectory}" + "Log/log_{Date}.txt", LogLevel.Information);
                 })
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureWebHostDefaults(webBuilder =>
