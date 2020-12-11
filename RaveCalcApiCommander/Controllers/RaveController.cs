@@ -15,7 +15,7 @@ using TimeZoneCorrectorLibrary.Abstraction;
 
 namespace RaveCalcApiCommander.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("apiv2")]
     [ApiController]
     public class RaveController : ControllerBase
