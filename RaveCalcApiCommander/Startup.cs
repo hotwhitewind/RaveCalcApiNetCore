@@ -1,3 +1,4 @@
+using System.IO;
 using System.Text;
 using Autofac;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -19,9 +20,12 @@ namespace RaveCalcApiCommander
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IWebHostEnvironment _env;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            _env = env;
         }
 
         public IConfiguration Configuration { get; }
@@ -46,9 +50,16 @@ namespace RaveCalcApiCommander
             });
             services.AddSingleton<IRaveRepository, MocRaveRepository>();
             services.AddTransient<IAuthorizationHandler, AuthHandler>();
-            services.AddSingleton<IEmbededResourceService, MocEmbededResourceService>();
+            services.AddSingleton<IEmbededResourceService>(c =>
+            {
+                return new MocEmbededResourceService();
+            });
             services.AddHttpContextAccessor();
             services.AddControllers();
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "wwwroot/dist/RaveCalcApiAngular";
+            });
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
@@ -76,13 +87,30 @@ namespace RaveCalcApiCommander
             app.UseHttpsRedirection();
 
             app.UseRouting();
-            
+            app.UseStaticFiles();
+
+            if (!env.IsDevelopment())
+            {
+                app.UseSpaStaticFiles();
+            }
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+            
+            app.UseSpa(spa =>
+            {
+                // To learn more about options for serving an Angular SPA from ASP.NET Core,
+                // see https://go.microsoft.com/fwlink/?linkid=864501
+
+                spa.Options.SourcePath = "..\\AngularFront";
+
+                if (env.IsDevelopment())
+                {
+                    spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
+                }
             });
         }
     }

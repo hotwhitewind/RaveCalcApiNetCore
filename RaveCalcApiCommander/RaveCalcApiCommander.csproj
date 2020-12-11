@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>a4fb8cc3-0723-425d-a367-7b8248cf59df</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -14,6 +15,7 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.4" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.10" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.6.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.3" />
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="2.0.0" />
@@ -21,12 +23,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Authorization\" />
+    <ProjectReference Include="..\RaveChartLibrary\RaveChartLibrary.csproj" />
+    <ProjectReference Include="..\TimeZoneCorrectorLibrary\TimeZoneCorrectorLibrary\TimeZoneCorrectorLibrary.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RaveChartLibrary\RaveChartLibrary.csproj" />
-    <ProjectReference Include="..\TimeZoneCorrectorLibrary\TimeZoneCorrectorLibrary\TimeZoneCorrectorLibrary.csproj" />
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
 
