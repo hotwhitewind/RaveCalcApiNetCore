@@ -4,7 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
 import { environment } from 'src/environments/environment';
-import { CountriesResponse } from '../common/response';
+import { CitiesResponse, CountriesResponse, CountryInfoResponse, StatesResponse } from '../common/response';
 import { IServiceParameters } from '../interfaces/data-service';
 import { DialogService } from './dialog.service';
 
@@ -65,9 +65,9 @@ export abstract class CommonService<TParameters extends IServiceParameters> {
   }
 
   protected showErrorMessage(messages: string[]) {
-/*      if (messages && messages.length > 0) {
-      this.parameters.dialogService.alert(messages).subscribe();
-   } */
+    /*      if (messages && messages.length > 0) {
+          this.parameters.dialogService.alert(messages).subscribe();
+       } */
   }
 
   protected showSuccessMessage(message: string) {
@@ -122,5 +122,27 @@ export class FillselectService /* extends BaseApiHttpService */ {
       }
       return throwError(err);
     })); */
+  }
+
+  getStates(countryName: string, showError = true): Observable<StatesResponse> {
+    const result = this.http.get<StatesResponse>(this.getUrl() + 'getallstates?countryName=' + countryName);
+    return result;
+  }
+
+  getCities(countryName: string, stateName: string, showError = true): Observable<CitiesResponse> {
+    if (stateName) {
+      const result = this.http.get<CitiesResponse>(this.getUrl() + 'getallcities?countryName=' + countryName +
+        "&stateName=" + stateName);
+      return result;
+    }
+    else {
+      const result = this.http.get<CitiesResponse>(this.getUrl() + 'getallcities?countryName=' + countryName);
+      return result;
+    }
+  }
+
+  getCountryInfo(countryName: string, showError = true): Observable<CountryInfoResponse> {
+    const result = this.http.get<CountryInfoResponse>(this.getUrl() + 'getcountryinfo?countryName=' + countryName);
+    return result;
   }
 }
