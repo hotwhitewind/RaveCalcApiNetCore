@@ -38,7 +38,7 @@ namespace RaveCalcApiCommander.Controllers
         [Route("getallcountries")]
         public ActionResult GetAllCountriesName()
         {
-            var countries = _timeZoneCorrector.GetAllCountries();
+            var countries = _timeZoneCorrector.GetCountries();
             if(countries == null)
             {
                 return BadRequest(new ResponseError
@@ -51,6 +51,38 @@ namespace RaveCalcApiCommander.Controllers
             {
                 error = false,
                 result = countries
+            });
+        }
+
+        [HttpGet]
+        [Route("getcountryinfo")]
+        public ActionResult GetCountryInfo([FromQuery] StatesQuery query)
+        {
+            if (query.countryName == null)
+            {
+                ModelState.AddModelError("countryName", "Отсутствует значение параметра");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ResponseError
+                {
+                    error = true,
+                    message = GetModelStateError()
+                });
+            }
+            var country = _timeZoneCorrector.GetCountryInfo(query.countryName);
+            if (country == null)
+            {
+                return BadRequest(new ResponseError
+                {
+                    error = true,
+                    message = "Country not found"
+                });
+            }
+            return Ok(new ResponseResult<Country>()
+            {
+                error = false,
+                result = country
             });
         }
 
@@ -70,7 +102,43 @@ namespace RaveCalcApiCommander.Controllers
                     message = GetModelStateError()
                 });
             }
-            var states = _timeZoneCorrector.GetAllStateByCountry(query.countryName);
+            var states = _timeZoneCorrector.GetStates(query.countryName);
+            if (states == null)
+            {
+                return BadRequest(new ResponseError
+                {
+                    error = true,
+                    message = "States not found"
+                });
+            }
+            return Ok(new ResponseResult<List<string>>()
+            {
+                error = false,
+                result = states
+            });
+        }
+
+        [HttpGet]
+        [Route("getalldistricts")]
+        public ActionResult GetAllDistrict([FromQuery] DistrictsQuery query)
+        {
+            if (query.countryName == null)
+            {
+                ModelState.AddModelError("countryName", "Отсутствует значение параметра");
+            }
+            if (query.stateName == null)
+            {
+                ModelState.AddModelError("stateName", "Отсутствует значение параметра");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ResponseError
+                {
+                    error = true,
+                    message = GetModelStateError()
+                });
+            }
+            var states = _timeZoneCorrector.GetDistricts(query.countryName, query.stateName);
             if (states == null)
             {
                 return BadRequest(new ResponseError
@@ -102,8 +170,8 @@ namespace RaveCalcApiCommander.Controllers
                     message = GetModelStateError()
                 });
             }
-            var cities = _timeZoneCorrector.GetAllCitiesByState(query.countryName, query.stateName);
-            if (cities == null)
+            var cities = _timeZoneCorrector.GetCities(query.countryName, query.stateName, query.districtName);
+            if(cities == null)
             {
                 return BadRequest(new ResponseError
                 {
@@ -120,7 +188,7 @@ namespace RaveCalcApiCommander.Controllers
 
         [HttpGet]
         [Route("getcity")]
-        public ActionResult GetCityByCountryStateAndCityName([FromQuery] CityQuery query)
+        public ActionResult GetCity([FromQuery] CityQuery query)
         {
             if (query.countryName == null)
             {
@@ -139,7 +207,7 @@ namespace RaveCalcApiCommander.Controllers
                     message = GetModelStateError()
                 });
             }
-            var city = _timeZoneCorrector.GetCityByCountryAndState(query.countryName, query.stateName, 
+            var city = _timeZoneCorrector.GetCity(query.countryName, query.stateName, query.districtName,
                 query.cityName);
             if (city == null)
             {
@@ -530,7 +598,7 @@ namespace RaveCalcApiCommander.Controllers
                 return 0;
             if (city.cityName != null)
             {
-                var cityRes = _timeZoneCorrector.GetCityByCountryAndState(city.countryName, city.stateName, city.cityName);
+                var cityRes = _timeZoneCorrector.GetCity(city.countryName, city.stateName, city.districtName, city.cityName);
                 if (cityRes == null)
                 {
                     return -1;
