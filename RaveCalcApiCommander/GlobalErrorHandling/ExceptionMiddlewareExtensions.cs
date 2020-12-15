@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using RaveCalcApiCommander.Models;
 using System;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace RaveCalcApiCommander.GlobalErrorHandling
@@ -39,7 +38,7 @@ namespace RaveCalcApiCommander.GlobalErrorHandling
 
         private Task HandleExceptionAsync(HttpContext context, HttpStatusCodeException exception)
         {
-            string result = null;
+            ResponseError result = null;
             context.Response.ContentType = "application/json";
             if (exception is HttpStatusCodeException)
             {
@@ -54,7 +53,7 @@ namespace RaveCalcApiCommander.GlobalErrorHandling
                 {
                     error = true,
                     message = $"{(int)exception.StatusCode} - {exception.Message}"
-                }.ToString();
+                };
                 context.Response.StatusCode = (int)exception.StatusCode;
             }
             else
@@ -71,30 +70,34 @@ namespace RaveCalcApiCommander.GlobalErrorHandling
                 {
                     error = true,
                     message = $"{(int)HttpStatusCode.InternalServerError} - Runtime Error"
-                }.ToString();
+                };
 
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
-            return context.Response.WriteAsync(result);
+            return context.Response.WriteAsync(JsonSerializer.Serialize(result));
         }
 
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             _logger.LogError(exception, $"{exception.Message}\n Trace:{exception.StackTrace}");
             var innerException = exception.InnerException;
+            var resultString = "";
             while (innerException != null)
             {
+                resultString += innerException.Message + "\n";
                 _logger.LogError(innerException, $"{innerException.Message} \n Trace:{innerException.StackTrace}");
                 innerException = innerException.InnerException;
             }
-            string result = new ResponseError
+            if (string.IsNullOrEmpty(resultString))
+                resultString = exception.Message;
+            var result = new ResponseError
             {
                 error = true,
-                message = $"{(int)HttpStatusCode.InternalServerError} - {exception.Message}"
-            }.ToString();
+                message = $"{(int)HttpStatusCode.InternalServerError} - {resultString}"
+            };
 
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            return context.Response.WriteAsync(result);
+            return context.Response.WriteAsync(JsonSerializer.Serialize(result));
         }
     }
 
@@ -115,7 +118,7 @@ namespace RaveCalcApiCommander.GlobalErrorHandling
 
         public HttpStatusCodeException(HttpStatusCode statusCode, Exception inner) : this(statusCode, inner.ToString()) { }
 
-        public HttpStatusCodeException(HttpStatusCode statusCode, JObject errorObject) : this(statusCode, errorObject.ToString())
+        public HttpStatusCodeException(HttpStatusCode statusCode, object errorObject) : this(statusCode, errorObject.ToString())
         {
             this.ContentType = @"application/json";
         }
@@ -129,7 +132,7 @@ namespace RaveCalcApiCommander.GlobalErrorHandling
 
         public override string ToString()
         {
-            return JsonConvert.SerializeObject(this);
+            return JsonSerializer.Serialize(this);
         }
     }
 }
