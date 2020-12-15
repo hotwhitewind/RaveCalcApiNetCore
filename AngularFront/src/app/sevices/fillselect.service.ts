@@ -18,7 +18,9 @@ export abstract class CommonService<TParameters extends IServiceParameters> {
   }
 
   protected catchErrorHandler(err: HttpErrorResponse) {
-    if (err.error) {
+    if (err.error instanceof Object) {
+      this.showError(err.error);
+    } else if (err.error) {
       this.showErrorMessage([err.message]);
     } else {
       // The backend returned an unsuccessful response code.
@@ -30,21 +32,19 @@ export abstract class CommonService<TParameters extends IServiceParameters> {
 
   protected showError(obj: any) {
     const messages: string[] = [];
-    if (obj.errors) {
-      this.fillMessages(obj.errors, messages);
-    } else {
+    if (obj.error) {
       this.fillMessages(obj, messages);
     }
     this.showErrorMessage(messages);
   }
 
   fillMessages(obj: any, messages: string[]) {
-    if (obj.errors && obj.errors instanceof Array) {
-      (obj.errors as Array<string>).forEach(w => {
+    if (obj.message && obj.message instanceof Array) {
+      (obj.message as Array<string>).forEach(w => {
         messages.push(w);
       });
-    } else if (obj.errors) {
-      this.fillMessages(obj.errors, messages);
+    } else if (obj.message) {
+      messages.push(obj.message);
     } else {
       Object.keys(obj).forEach((key) => {
         const value = obj[key];
