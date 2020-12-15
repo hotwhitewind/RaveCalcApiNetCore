@@ -5,3 +5,8 @@ button.calendar, button.calendar:active {
   background-size: 23px;
   background-position: center;
 }
+
+div.scroll {
+  height: 75vh;
+  overflow-y: auto;
+}

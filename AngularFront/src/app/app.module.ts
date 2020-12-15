@@ -9,6 +9,7 @@ import { AppComponent } from './app.component';
 import { UserdateComponent } from './components/userdate/userdate.component';
 import { AlertComponent } from './components/dialogs/alert/alert.component';
 import { ErrorListComponent } from './components/dialogs/error-list/error-list.component';
+import { NgxJsonViewerModule } from 'ngx-json-viewer';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { ErrorListComponent } from './components/dialogs/error-list/error-list.c
     AppRoutingModule,
     NgbModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    NgxJsonViewerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

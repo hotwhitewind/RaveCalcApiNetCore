@@ -35,7 +35,8 @@
               <div class="form-group">
                 <select formControlName="district" class="form-control" id="district">
                   <option [ngValue]="null" [disabled]="currentDistricts == null">Select District</option>
-                  <option *ngFor="let district of currentDistricts; let i = index" [ngValue]="currentDistricts[i].districtName">
+                  <option *ngFor="let district of currentDistricts; let i = index"
+                    [ngValue]="currentDistricts[i].districtName">
                     {{district.districtName}}
                   </option>
                 </select>
@@ -52,7 +53,8 @@
                 <div class="label">Дата рождения</div>
                 <div class="input-group">
                   <input formControlName="birthdate" class="form-control" placeholder="dd-mm-yyyy" name="dp"
-                    ngbDatepicker #d="ngbDatepicker" />
+                    ngbDatepicker #d="ngbDatepicker" [minDate]="{year: 1200, month: 1, day: 1}"
+                    [maxDate]="{year: 2148, month: 12, day: 31}" />
                   <div class="input-group-append">
                     <button class="btn btn-outline-secondary calendar" (click)="d.toggle()" type="button"></button>
                   </div>
@@ -63,9 +65,31 @@
                 <ngb-timepicker formControlName="birthtime"></ngb-timepicker>
               </div>
               <div class="form-group">
-                <input type="submit" value="Рассчитать" class="btn btn-outline-dark" />
+                <input type="submit" value="Рассчитать" class="btn btn-outline-dark" [disabled]="currentCity == null" />
               </div>
             </form>
+          </div>
+        </div>
+        <div *ngIf="currentCity != null;" #collapse="ngbCollapse" [(ngbCollapse)]="isCollapsed">
+          <div class="card">
+            <div class="card-body">
+              <p><strong>City name: </strong>{{currentCity.cityName}}</p>
+              <p><strong>City latitude: </strong>{{currentCity.latitude}}</p>
+              <p><strong>City longitude: </strong>{{currentCity.longitude}}</p>
+              <p><strong>City timezone: </strong>{{currentCity.timeZone}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col scroll">
+        <div *ngIf="currentJsonResponce != null && currentJsonResponce != '';" #collapse="ngbCollapse"
+          [(ngbCollapse)]="isCollapsedJson">
+          <div>
+            <p><strong>City name: </strong>{{currentCity.cityName}}</p>
+            <p><strong>City latitude: </strong>{{currentCity.latitude}}</p>
+            <p><strong>City longitude: </strong>{{currentCity.longitude}}</p>
+            <p><strong>City timezone: </strong>{{currentCity.timeZone}}</p>
+            <ngx-json-viewer [json]="currentJsonResponce"></ngx-json-viewer>
           </div>
         </div>
       </div>

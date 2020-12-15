@@ -4,7 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
 import { environment } from 'src/environments/environment';
-import { CitiesResponse, CountriesResponse, CountryInfoResponse, StatesResponse } from '../common/response';
+import { CitiesResponse, CountriesResponse, CountryInfoResponse, RaveResponse, StatesResponse } from '../common/response';
 import { IServiceParameters } from '../interfaces/data-service';
 import { DialogService } from './dialog.service';
 
@@ -143,6 +143,11 @@ export class FillselectService /* extends BaseApiHttpService */ {
 
   getCountryInfo(countryName: string, showError = true): Observable<CountryInfoResponse> {
     const result = this.http.get<CountryInfoResponse>(this.getUrl() + 'getcountryinfo?countryName=' + countryName);
+    return result;
+  }
+
+  getRaveJson(birthdate: string, birthtime: string, timezone: string): Observable<RaveResponse> {
+    const result = this.http.get<RaveResponse>(this.getUrl() + 'rave-chart?birthdate=' + birthdate + "T" + birthtime + "&timezone=" + timezone);
     return result;
   }
 }

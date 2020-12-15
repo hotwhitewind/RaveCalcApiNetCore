@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { NgbCalendar, NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCalendar, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct, NgbTimeAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { of } from 'rxjs';
-import { City, CountriesResponse, Country, CountryInfoResponse, District, State } from 'src/app/common/response';
-import { NgbDateCustomParserFormatter } from '../../../filters/dateformat';
+import { CountriesResponse, CountryInfoResponse, RaveResponse } from 'src/app/common/response';
+import { City, Country, District, State } from 'src/app/common/model';
+import { NgbDateCustomAdapter, NgbDateCustomParserFormatter } from '../../../filters/dateformat';
 import { FillselectService } from '../../sevices/fillselect.service';
+import { NgbTimeStringAdapter } from 'src/filters/timeformat';
 
 @Component({
   selector: 'app-userdate',
@@ -12,6 +14,8 @@ import { FillselectService } from '../../sevices/fillselect.service';
   styleUrls: ['./userdate.component.scss'],
   providers: [
     { provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter },
+    { provide: NgbDateAdapter, useClass: NgbDateCustomAdapter },
+    { provide: NgbTimeAdapter, useClass: NgbTimeStringAdapter },
     { provide: FillselectService }
   ]
 })
@@ -27,23 +31,30 @@ export class UserdateComponent implements OnInit {
     this._dataForm = value;
   }
 
+  isCollapsed: boolean;
+  isCollapsedJson: boolean;
   countries: string[];
   currentCountry: Country;
-
+  currentCity: City;
   currentStates: State[];
   currentDistricts: District[];
   currentCities: City[];
+  currentJsonResponce: string;
 
-  constructor(private fb: FormBuilder, private calendar: NgbCalendar, private http: FillselectService) { }
+  constructor(private fb: FormBuilder, private calendar: NgbCalendar, private http: FillselectService,
+    private dateAdapter: NgbDateAdapter<string>, private timeAdapter: NgbTimeAdapter<string>) { }
 
   ngOnInit() {
+    this.currentJsonResponce = null;
+    this.isCollapsed = true;
+    this.isCollapsedJson = true;
     this.dataForm = this.fb.group({
       country: [null],
       state: [null],
       district: [null],
       city: [null],
-      birthdate: this.calendar.getToday(),
-      birthtime: { hour: 0, minute: 0 }
+      birthdate: this.dateAdapter.toModel(this.calendar.getToday()),
+      birthtime: '00:00'
     });
 
     this.dataForm.get("country").valueChanges
@@ -66,7 +77,7 @@ export class UserdateComponent implements OnInit {
         this.onCityChanged(f);
       });
 
-    of((this.http.getCountries()).subscribe((data: CountriesResponse) => {
+    of(this.http.getCountries().subscribe((data: CountriesResponse) => {
       this.countries = data.result;
     }));
   }
@@ -121,7 +132,13 @@ export class UserdateComponent implements OnInit {
   }
 
   onCityChanged(e) {
-
+    if (e == null) {
+      this.isCollapsed = true;
+    }
+    else {
+      this.currentCity = this.currentCities.find(c => c.cityName == e);
+      this.isCollapsed = false;
+    }
   }
 
   onSubmit(form: FormGroup) {
@@ -132,5 +149,11 @@ export class UserdateComponent implements OnInit {
     console.log('Birthdate', form.value.birthdate);
     console.log('BirthTime', form.value.birthtime);
     console.log(form.value);
+    this.http.getRaveJson(form.value.birthdate,
+      form.value.birthtime, "Europe/Moscow").subscribe((data: RaveResponse) => {
+        this.currentJsonResponce = data.result;
+        console.log(this.currentJsonResponce);
+      })
+      this.isCollapsedJson = false;
   }
 }
