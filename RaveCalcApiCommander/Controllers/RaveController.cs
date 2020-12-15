@@ -144,7 +144,7 @@ namespace RaveCalcApiCommander.Controllers
                 return BadRequest(new ResponseError
                 {
                     error = true,
-                    message = "States not found"
+                    message = "Districts not found"
                 });
             }
             return Ok(new ResponseResult<List<string>>()
@@ -609,6 +609,7 @@ namespace RaveCalcApiCommander.Controllers
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError(ex, "Error convert date");
                     return -2;
                 }
                 return 0;
