@@ -31,8 +31,6 @@ export class UserdateComponent implements OnInit {
     this._dataForm = value;
   }
 
-  isCollapsed: boolean;
-  isCollapsedJson: boolean;
   countries: string[];
   currentCountry: Country;
   currentCity: City;
@@ -46,8 +44,6 @@ export class UserdateComponent implements OnInit {
 
   ngOnInit() {
     this.currentJsonResponce = null;
-    this.isCollapsed = true;
-    this.isCollapsedJson = true;
     this.dataForm = this.fb.group({
       country: [null],
       state: [null],
@@ -133,11 +129,10 @@ export class UserdateComponent implements OnInit {
 
   onCityChanged(e) {
     if (e == null) {
-      this.isCollapsed = true;
+      this.currentCity = null;
     }
     else {
       this.currentCity = this.currentCities.find(c => c.cityName == e);
-      this.isCollapsed = false;
     }
   }
 
@@ -154,6 +149,5 @@ export class UserdateComponent implements OnInit {
         this.currentJsonResponce = data.result;
         console.log(this.currentJsonResponce);
       })
-      this.isCollapsedJson = false;
   }
 }

@@ -70,7 +70,7 @@
             </form>
           </div>
         </div>
-        <div *ngIf="currentCity != null;" #collapse="ngbCollapse" [(ngbCollapse)]="isCollapsed">
+        <div *ngIf="currentCity != null;" #collapse="ngbCollapse" (ngbCollapse)="currentCity != null">
           <div class="card">
             <div class="card-body">
               <p><strong>City name: </strong>{{currentCity.cityName}}</p>
@@ -83,7 +83,7 @@
       </div>
       <div class="col scroll">
         <div *ngIf="currentJsonResponce != null && currentJsonResponce != '';" #collapse="ngbCollapse"
-          [(ngbCollapse)]="isCollapsedJson">
+          (ngbCollapse)="currentJsonResponce != null && currentJsonResponce != ''">
           <div>
             <p><strong>City name: </strong>{{currentCity.cityName}}</p>
             <p><strong>City latitude: </strong>{{currentCity.latitude}}</p>
