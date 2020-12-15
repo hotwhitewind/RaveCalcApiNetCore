@@ -11,6 +11,7 @@ namespace RaveCalcApiCommander.Models
     {
         public string auth { get; set; }
         public string birthdate { get; set; }
+        public string timezone { get; set; }
         public CityQuery city { get; set; }
     }
 
@@ -18,6 +19,7 @@ namespace RaveCalcApiCommander.Models
     {
         public string auth { get; set; }
         public string birthdate { get; set; }
+        public string timezone { get; set; }
         public CityQuery city { get; set; }
         public string cycledate { get; set; }
         public string cycletype { get; set; }
@@ -27,6 +29,7 @@ namespace RaveCalcApiCommander.Models
     {
         public string auth { get; set; }
         public string birthdate { get; set; }
+        public string timezone { get; set; }
         public CityQuery city { get; set; }
         public string transitdate { get; set; }
     }

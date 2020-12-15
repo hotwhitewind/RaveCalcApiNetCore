@@ -252,19 +252,16 @@ namespace RaveCalcApiCommander.Controllers
             {
                 ModelState.AddModelError("date", "Недопустимый формат даты");
             }
-            try
+            if (_timeZoneCorrector.ConvertToUtcFromCustomTimeZone(query.timeZoneName, dateFormat, out DateTime utcDate))
             {
-                var utcDate = _timeZoneCorrector.ConvertToUtcFromCustomTimeZone(query.timeZoneName, dateFormat);
                 return Ok(new ResponseResult<DateTime>()
                 {
                     error = false,
                     result = utcDate
                 });
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError(ex, "Error converting date");
-
                 return BadRequest(new ResponseError
                 {
                     error = true,
@@ -283,6 +280,11 @@ namespace RaveCalcApiCommander.Controllers
                 ModelState.AddModelError("birthdate", "Отсутствует значение параметра");
             }
 
+            if(!string.IsNullOrEmpty(query.timezone) && query.city != null)
+            {
+                ModelState.AddModelError("timezone", "Необходимо указать только один параметр: город или timezone");
+            }
+
             CheckDateParam(query.birthdate, "birthdate", out DateTime birthDate);
             CheckCityParam(query.city, null);
 
@@ -294,9 +296,13 @@ namespace RaveCalcApiCommander.Controllers
                     message = GetModelStateError()
                 });
             }
-            if (query.city != null)
+            if (query.city != null || !string.IsNullOrEmpty(query.timezone))
             {
-                int res = ConvertDate(query.city, birthDate, out birthDate);
+                int res;
+                if (!string.IsNullOrEmpty(query.timezone))                
+                    res = ConvertDate(query.timezone, birthDate, out birthDate);
+                else
+                    res = ConvertDate(query.city, birthDate, out birthDate);
                 if (res == -1)
                 {
                     return BadRequest(new ResponseError
@@ -335,6 +341,11 @@ namespace RaveCalcApiCommander.Controllers
                 ModelState.AddModelError("cycledate", "Отсутствует значение параметра");
             }
 
+            if (!string.IsNullOrEmpty(query.timezone) && query.city != null)
+            {
+                ModelState.AddModelError("timezone", "Необходимо указать только один параметр: город или timezone");
+            }
+
             CheckDateParam(query.birthdate, "birthdate", out DateTime birthDate);
             CheckDateParam(query.cycledate, "cycledate", out DateTime cycleDate);
 
@@ -353,9 +364,13 @@ namespace RaveCalcApiCommander.Controllers
                     message = GetModelStateError()
                 });
             }
-            if (query.city != null)
+            if (query.city != null || !string.IsNullOrEmpty(query.timezone))
             {
-                int res = ConvertDate(query.city, birthDate, out birthDate);
+                int res;
+                if (!string.IsNullOrEmpty(query.timezone))
+                    res = ConvertDate(query.timezone, birthDate, out birthDate);
+                else
+                    res = ConvertDate(query.city, birthDate, out birthDate);
                 if (res == -1)
                 {
                     return BadRequest(new ResponseError
@@ -394,6 +409,11 @@ namespace RaveCalcApiCommander.Controllers
                 ModelState.AddModelError("transitdate", "Отсутствует значение параметра");
             }
 
+            if (!string.IsNullOrEmpty(query.timezone) && query.city != null)
+            {
+                ModelState.AddModelError("timezone", "Необходимо указать только один параметр: город или timezone");
+            }
+
             CheckDateParam(query.birthdate, "birthdate", out DateTime birthDate);
 
             CheckDateParam(query.birthdate, "transitDate", out DateTime transitDate);
@@ -409,9 +429,13 @@ namespace RaveCalcApiCommander.Controllers
                     message = GetModelStateError()
                 });
             }
-            if (query.city != null)
+            if (query.city != null || !string.IsNullOrEmpty(query.timezone))
             {
-                int res = ConvertDate(query.city, birthDate, out birthDate);
+                int res;
+                if (!string.IsNullOrEmpty(query.timezone))
+                    res = ConvertDate(query.timezone, birthDate, out birthDate);
+                else
+                    res = ConvertDate(query.city, birthDate, out birthDate);
                 if (res == -1)
                 {
                     return BadRequest(new ResponseError
@@ -458,6 +482,11 @@ namespace RaveCalcApiCommander.Controllers
                     birthdates.Add(birthDate);
                 }
                 CheckCityParam(birthdate.city, i + 1);
+
+                if (!string.IsNullOrEmpty(birthdate.timezone) && birthdate.city != null)
+                {
+                    ModelState.AddModelError("timezone", "Необходимо указать только один параметр: город или timezone");
+                }
             }
 
             if (!ModelState.IsValid)
@@ -472,9 +501,15 @@ namespace RaveCalcApiCommander.Controllers
             for (int i = 0; i < query.birthdates.Count; i++)
             {
                 Query birthdate = query.birthdates[i];
-                if (birthdate.city != null)
+                if (birthdate.city != null || !string.IsNullOrEmpty(birthdate.timezone))
                 {
-                    int res = ConvertDate(birthdate.city, birthdates[i], out DateTime convbirthdate);
+                    int res;
+                    DateTime convbirthdate;
+
+                    if (!string.IsNullOrEmpty(birthdate.timezone))
+                        res = ConvertDate(birthdate.timezone, birthdates[i], out convbirthdate);
+                    else
+                        res = ConvertDate(birthdate.city, birthdates[i], out convbirthdate);
 
                     if (res == -1)
                     {
@@ -591,6 +626,19 @@ namespace RaveCalcApiCommander.Controllers
             }
         }
 
+        private int ConvertDate(string timezone, DateTime inDateTime, out DateTime outDateTime)
+        {
+            outDateTime = inDateTime;
+            if (string.IsNullOrEmpty(timezone))
+            {
+                return 0;
+            }
+            if (_timeZoneCorrector.ConvertToUtcFromCustomTimeZone(timezone, (DateTime)inDateTime, out outDateTime))
+                return 0;
+            else
+                return -2;
+        }
+
         private int ConvertDate(CityQuery city, DateTime inDateTime, out DateTime outDateTime)
         {
             outDateTime = inDateTime;
@@ -603,16 +651,11 @@ namespace RaveCalcApiCommander.Controllers
                 {
                     return -1;
                 }
-                try
-                {
-                    outDateTime = _timeZoneCorrector.ConvertToUtcFromCustomTimeZone(cityRes.TimeZone, (DateTime)inDateTime);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error convert date");
+                if (_timeZoneCorrector.ConvertToUtcFromCustomTimeZone(cityRes.TimeZone,
+                    (DateTime)inDateTime, out outDateTime))
+                    return 0;
+                else
                     return -2;
-                }
-                return 0;
             }
             return -1;
         }
