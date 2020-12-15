@@ -1,3 +1,10 @@
+import { BooleanLiteral } from "typescript";
+
+export class BackendError{
+  error: boolean;
+  message: string;
+}
+
 export class City {
   cityAsciiName: string;
   cityName: string;

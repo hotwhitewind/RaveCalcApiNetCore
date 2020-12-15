@@ -1,4 +1,5 @@
 import { Component, ViewEncapsulation, OnInit, Inject, Input } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-alert',
@@ -9,7 +10,7 @@ import { Component, ViewEncapsulation, OnInit, Inject, Input } from '@angular/co
 
 export class AlertComponent implements OnInit {
   messages: string[];
-  constructor() { }
+  constructor(public activeModal: NgbActiveModal) { }
 
   ngOnInit(): void {
   }
