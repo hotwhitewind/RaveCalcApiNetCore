@@ -287,6 +287,7 @@ namespace RaveCalcApiCommander.Controllers
 
             CheckDateParam(query.birthdate, "birthdate", out DateTime birthDate);
             CheckCityParam(query.city, null);
+            DateTime queryBirthDate = birthDate;
 
             if (!ModelState.IsValid)
             {
@@ -321,6 +322,7 @@ namespace RaveCalcApiCommander.Controllers
                 }
             }
             var rave =_raveRepo.GetRaveChartInJson(birthDate) as AdvancedImagingChart;
+            rave.BirthDate = queryBirthDate;
             return Ok(new ResponseResult<object>()
             {
                 error = false,
