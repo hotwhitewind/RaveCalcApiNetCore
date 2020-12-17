@@ -28,4 +28,10 @@ namespace RaveCalcApiCommander.Models
         public string UserName { get; set; }
         public string Token { get; set; }
     }
+
+    public class DateConvertResult
+    {
+        public DateTime dateConvertOut;
+        public int errorType;
+    }
 }

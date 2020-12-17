@@ -51,7 +51,7 @@ namespace RaveCalcApiCommander
 
         [HttpGet]
         [Route("getcountryinfo")]
-        public ActionResult GetCountryInfo([FromQuery] StatesQuery query)
+        public async Task<ActionResult> GetCountryInfo([FromQuery] StatesQuery query)
         {
             if (query.countryName == null)
             {
@@ -65,7 +65,7 @@ namespace RaveCalcApiCommander
                     message = GetModelStateError()
                 });
             }
-            var country = _timeZoneCorrector.GetCountryInfo(query.countryName);
+            var country = await _timeZoneCorrector.GetCountryInfo(query.countryName);
             if (country == null)
             {
                 return BadRequest(new ResponseError
@@ -83,7 +83,7 @@ namespace RaveCalcApiCommander
 
         [HttpGet]
         [Route("getallstates")]
-        public ActionResult GetAllStates([FromQuery] StatesQuery query)
+        public async Task<ActionResult> GetAllStates([FromQuery] StatesQuery query)
         {
             if (query.countryName == null)
             {
@@ -97,7 +97,7 @@ namespace RaveCalcApiCommander
                     message = GetModelStateError()
                 });
             }
-            var states = _timeZoneCorrector.GetStates(query.countryName);
+            var states = await _timeZoneCorrector.GetStates(query.countryName);
             if (states == null)
             {
                 return BadRequest(new ResponseError
@@ -115,7 +115,7 @@ namespace RaveCalcApiCommander
 
         [HttpGet]
         [Route("getalldistricts")]
-        public ActionResult GetAllDistrict([FromQuery] DistrictsQuery query)
+        public async Task<ActionResult> GetAllDistrict([FromQuery] DistrictsQuery query)
         {
             if (query.countryName == null)
             {
@@ -133,7 +133,7 @@ namespace RaveCalcApiCommander
                     message = GetModelStateError()
                 });
             }
-            var states = _timeZoneCorrector.GetDistricts(query.countryName, query.stateName);
+            var states = await _timeZoneCorrector.GetDistricts(query.countryName, query.stateName);
             if (states == null)
             {
                 return BadRequest(new ResponseError
@@ -151,7 +151,7 @@ namespace RaveCalcApiCommander
 
         [HttpGet]
         [Route("getallcities")]
-        public ActionResult GetAllCities([FromQuery] CitiesQuery query)
+        public async Task<ActionResult> GetAllCities([FromQuery] CitiesQuery query)
         {
             if (query.countryName == null)
             {
@@ -165,7 +165,7 @@ namespace RaveCalcApiCommander
                     message = GetModelStateError()
                 });
             }
-            var cities = _timeZoneCorrector.GetCities(query.countryName, query.stateName, query.districtName);
+            var cities = await _timeZoneCorrector.GetCities(query.countryName, query.stateName, query.districtName);
             if (cities == null)
             {
                 return BadRequest(new ResponseError
@@ -183,7 +183,7 @@ namespace RaveCalcApiCommander
 
         [HttpGet]
         [Route("getcity")]
-        public ActionResult GetCity([FromQuery] CityQuery query)
+        public async Task<ActionResult> GetCity([FromQuery] CityQuery query)
         {
             if (query.countryName == null)
             {
@@ -202,7 +202,7 @@ namespace RaveCalcApiCommander
                     message = GetModelStateError()
                 });
             }
-            var city = _timeZoneCorrector.GetCity(query.countryName, query.stateName, query.districtName,
+            var city = await _timeZoneCorrector.GetCity(query.countryName, query.stateName, query.districtName,
                 query.cityName);
             if (city == null)
             {

@@ -2,11 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ConvertGeoNamesDBToMongoDB.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using RaveCalcApiCommander.Abstraction;
 using RaveCalcApiCommander.Data;
 using RaveCalcApiCommander.Models;
 using Stratogos.Jovian.Rave.Charts;
@@ -37,7 +39,7 @@ namespace RaveCalcApiCommander.Controllers
         //2020-03-05T12:01:41
         [HttpGet]
         [Route("rave-chart")]
-        public ActionResult GetRaveChartJson([FromQuery]Query query)
+        public async Task<ActionResult> GetRaveChartJson([FromQuery]Query query)
         {
             if(query.birthdate == null)
             {
@@ -63,12 +65,13 @@ namespace RaveCalcApiCommander.Controllers
             }
             if (query.city != null || !string.IsNullOrEmpty(query.timezone))
             {
-                int res;
+                DateConvertResult res;
                 if (!string.IsNullOrEmpty(query.timezone))                
-                    res = ConvertDate(query.timezone, birthDate, out birthDate);
+                    res = ConvertDate(query.timezone, birthDate);
                 else
-                    res = ConvertDate(query.city, birthDate, out birthDate);
-                if (res == -1)
+                    res = await ConvertDate(query.city, birthDate);
+                birthDate = res.dateConvertOut;
+                if (res.errorType == -1)
                 {
                     return BadRequest(new ResponseError
                     {
@@ -76,7 +79,7 @@ namespace RaveCalcApiCommander.Controllers
                         message = "City not found"
                     });
                 }
-                if (res == -2)
+                if (res.errorType == -2)
                 {
                     return BadRequest(new ResponseError
                     {
@@ -96,7 +99,7 @@ namespace RaveCalcApiCommander.Controllers
 
         [HttpGet]
         [Route("rave-circlechart")]
-        public ActionResult GetRaveCircleChartJson([FromQuery]CycleQuery query)
+        public async Task<ActionResult> GetRaveCircleChartJson([FromQuery]CycleQuery query)
         {
             if (query.birthdate == null)
             {
@@ -132,12 +135,13 @@ namespace RaveCalcApiCommander.Controllers
             }
             if (query.city != null || !string.IsNullOrEmpty(query.timezone))
             {
-                int res;
+                DateConvertResult res;
                 if (!string.IsNullOrEmpty(query.timezone))
-                    res = ConvertDate(query.timezone, birthDate, out birthDate);
+                    res = ConvertDate(query.timezone, birthDate);
                 else
-                    res = ConvertDate(query.city, birthDate, out birthDate);
-                if (res == -1)
+                    res = await ConvertDate(query.city, birthDate);
+                birthDate = res.dateConvertOut;
+                if (res.errorType == -1)
                 {
                     return BadRequest(new ResponseError
                     {
@@ -145,7 +149,7 @@ namespace RaveCalcApiCommander.Controllers
                         message = "City not found"
                     });
                 }
-                if (res == -2)
+                if (res.errorType == -2)
                 {
                     return BadRequest(new ResponseError
                     {
@@ -164,7 +168,7 @@ namespace RaveCalcApiCommander.Controllers
 
         [HttpGet]
         [Route("rave-transitchart")]
-        public ActionResult GetRaveTransitChartJson([FromQuery]TransitQuery query)
+        public async Task<ActionResult> GetRaveTransitChartJson([FromQuery]TransitQuery query)
         {
             if (query.birthdate == null)
             {
@@ -197,12 +201,13 @@ namespace RaveCalcApiCommander.Controllers
             }
             if (query.city != null || !string.IsNullOrEmpty(query.timezone))
             {
-                int res;
+                DateConvertResult res;
                 if (!string.IsNullOrEmpty(query.timezone))
-                    res = ConvertDate(query.timezone, birthDate, out birthDate);
+                    res = ConvertDate(query.timezone, birthDate);
                 else
-                    res = ConvertDate(query.city, birthDate, out birthDate);
-                if (res == -1)
+                    res = await ConvertDate(query.city, birthDate);
+                birthDate = res.dateConvertOut;
+                if (res.errorType == -1)
                 {
                     return BadRequest(new ResponseError
                     {
@@ -210,7 +215,7 @@ namespace RaveCalcApiCommander.Controllers
                         message = "City not found"
                     });
                 }
-                if (res == -2)
+                if (res.errorType == -2)
                 {
                     return BadRequest(new ResponseError
                     {
@@ -230,7 +235,7 @@ namespace RaveCalcApiCommander.Controllers
 
         [HttpGet]
         [Route("rave-connectionchart")]
-        public ActionResult GetRaveConnectionChartJson([FromQuery]ConnectionQuery query)
+        public async Task<ActionResult> GetRaveConnectionChartJson([FromQuery]ConnectionQuery query)
         {
             List<DateTime> birthdates = new List<DateTime>();
 
@@ -269,15 +274,16 @@ namespace RaveCalcApiCommander.Controllers
                 Query birthdate = query.birthdates[i];
                 if (birthdate.city != null || !string.IsNullOrEmpty(birthdate.timezone))
                 {
-                    int res;
+                    DateConvertResult res;
                     DateTime convbirthdate;
 
                     if (!string.IsNullOrEmpty(birthdate.timezone))
-                        res = ConvertDate(birthdate.timezone, birthdates[i], out convbirthdate);
+                        res = ConvertDate(birthdate.timezone, birthdates[i]);
                     else
-                        res = ConvertDate(birthdate.city, birthdates[i], out convbirthdate);
+                        res = await ConvertDate(birthdate.city, birthdates[i]);
 
-                    if (res == -1)
+                    convbirthdate = res.dateConvertOut;
+                    if (res.errorType == -1)
                     {
                         return BadRequest(new ResponseError
                         {
@@ -285,7 +291,7 @@ namespace RaveCalcApiCommander.Controllers
                             message = $"City{i + 1} not found"
                         });
                     }
-                    if (res == -2)
+                    if (res.errorType == -2)
                     {
                         return BadRequest(new ResponseError
                         {
@@ -307,7 +313,7 @@ namespace RaveCalcApiCommander.Controllers
 
         [HttpGet]
         [Route("rave-pentamodel")]
-        public ActionResult GetRavePentaModelJson([FromQuery]PentaQuery query)
+        public async Task<ActionResult> GetRavePentaModelJson([FromQuery]PentaQuery query)
         {
             List<DateTime> birthdates = new List<DateTime>();
             if (query.birthdates == null)
@@ -348,11 +354,18 @@ namespace RaveCalcApiCommander.Controllers
             for(int i = 0; i < query.birthdates.Count; i++) 
             {
                 Query birthdate = query.birthdates[i];
-                if (birthdate.city != null)
+                if (birthdate.city != null || !string.IsNullOrEmpty(birthdate.timezone))
                 {
-                    int res = ConvertDate(birthdate.city, birthdates[i], out DateTime convbirthdate);
+                    DateTime convbirthdate;
+                    DateConvertResult res;
 
-                    if (res == -1)
+                    if (!string.IsNullOrEmpty(birthdate.timezone))
+                        res = ConvertDate(birthdate.timezone, birthdates[i]);
+                    else
+                        res = await ConvertDate(birthdate.city, birthdates[i]);
+
+                    convbirthdate = res.dateConvertOut;
+                    if (res.errorType == -1)
                     {
                         return BadRequest(new ResponseError
                         {
@@ -360,7 +373,7 @@ namespace RaveCalcApiCommander.Controllers
                             message = $"City{i + 1} not found"
                         });
                     }
-                    if (res == -2)
+                    if (res.errorType == -2)
                     {
                         return BadRequest(new ResponseError
                         {
@@ -392,38 +405,51 @@ namespace RaveCalcApiCommander.Controllers
             }
         }
 
-        private int ConvertDate(string timezone, DateTime inDateTime, out DateTime outDateTime)
+        private DateConvertResult ConvertDate(string timezone, DateTime inDateTime)
         {
-            outDateTime = inDateTime;
+            DateConvertResult result = new DateConvertResult();
+            result.dateConvertOut = inDateTime;
+            result.errorType = 0;
             if (string.IsNullOrEmpty(timezone))
             {
-                return 0;
+                return result;
             }
-            if (_timeZoneCorrector.ConvertToUtcFromCustomTimeZone(timezone, (DateTime)inDateTime, out outDateTime))
-                return 0;
-            else
-                return -2;
+            if (!_timeZoneCorrector.ConvertToUtcFromCustomTimeZone(timezone, (DateTime)inDateTime, out result.dateConvertOut))
+            {
+                result.errorType = -2;
+            }
+            return result;
         }
 
-        private int ConvertDate(CityQuery city, DateTime inDateTime, out DateTime outDateTime)
+        private async Task<DateConvertResult> ConvertDate(CityQuery city, DateTime inDateTime)
         {
-            outDateTime = inDateTime;
+            DateConvertResult result = new DateConvertResult();
+            result.dateConvertOut = inDateTime;
+            result.errorType = 0;
             if (city == null)
-                return 0;
+                return result;
             if (city.cityName != null)
             {
-                var cityRes = _timeZoneCorrector.GetCity(city.countryName, city.stateName, city.districtName, city.cityName);
+                var cityRes = await _timeZoneCorrector.GetCity(city.countryName, city.stateName, city.districtName, city.cityName);
                 if (cityRes == null)
                 {
-                    return -1;
+                    result.errorType = -1;
+                    return result;
                 }
                 if (_timeZoneCorrector.ConvertToUtcFromCustomTimeZone(cityRes.TimeZone,
-                    (DateTime)inDateTime, out outDateTime))
-                    return 0;
+                    (DateTime)inDateTime, out result.dateConvertOut))
+                {
+                    result.errorType = 0;
+                    return result;
+                }
                 else
-                    return -2;
+                {
+                    result.errorType = -2;
+                    return result;
+                }
             }
-            return -1;
+            result.errorType = -1;
+            return result;
         }
 
         private void CheckCityParam(CityQuery param, int? paramId)
