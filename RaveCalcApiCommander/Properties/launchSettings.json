@@ -12,15 +12,13 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "RaveCalcApiCommander": {
       "commandName": "Project",
-      "workingDirectory": "../build/netcoreapp3.1",
-      "launchUrl": "",
+      "workingDirectory": "../build/net5.0",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
