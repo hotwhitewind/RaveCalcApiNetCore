@@ -7,6 +7,8 @@ import { City, Country, District, State } from 'src/app/common/model';
 import { NgbDateCustomAdapter, NgbDateCustomParserFormatter } from '../../../filters/dateformat';
 import { FillselectService } from '../../sevices/fillselect.service';
 import { NgbTimeStringAdapter } from 'src/filters/timeformat';
+import { User } from 'src/app/common/authModels';
+import { AuthenticationService } from 'src/app/sevices/authentication.service';
 
 @Component({
   selector: 'app-userdate',
@@ -31,6 +33,7 @@ export class UserdateComponent implements OnInit {
     this._dataForm = value;
   }
 
+  currentUser: User;
   countries: string[];
   currentCountry: Country;
   currentCity: City;
@@ -40,7 +43,9 @@ export class UserdateComponent implements OnInit {
   currentJsonResponce: string;
 
   constructor(private fb: FormBuilder, private calendar: NgbCalendar, private http: FillselectService,
-    private dateAdapter: NgbDateAdapter<string>, private timeAdapter: NgbTimeAdapter<string>) { }
+    private dateAdapter: NgbDateAdapter<string>, private timeAdapter: NgbTimeAdapter<string>, private authenticationService: AuthenticationService) {
+    this.currentUser = this.authenticationService.currentUserValue;
+  }
 
   ngOnInit() {
     this.currentJsonResponce = null;

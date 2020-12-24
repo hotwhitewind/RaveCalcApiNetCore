@@ -1,4 +1,4 @@
-import { BooleanLiteral } from "typescript";
+import { User } from "./authModels";
 import { Country } from "./model";
 
 export class CountriesResponse {
@@ -24,4 +24,9 @@ export class CountryInfoResponse {
 export class RaveResponse {
   error: boolean;
   result: string;
+}
+
+export class UserResponse{
+  error: boolean;
+  result: User;
 }
