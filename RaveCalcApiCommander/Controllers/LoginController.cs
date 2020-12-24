@@ -9,7 +9,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using RaveCalcApiCommander.Abstraction;
 using RaveCalcApiCommander.Models;
+using TimeZoneCorrectorLibrary.Abstraction;
 
 namespace RaveCalcApiCommander.Controllers
 {
@@ -18,14 +20,43 @@ namespace RaveCalcApiCommander.Controllers
     public class LoginController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        private readonly IUserRepository _userRepository;
 
-        public LoginController(IConfiguration configuration)
+        public LoginController(IConfiguration configuration, IUserRepository userRepository)
         {
+            _userRepository = userRepository;            
             _configuration = configuration;
         }
 
         [HttpPost]
-        public IActionResult Login([FromBody] User userInfo)
+        public async Task<IActionResult> Login([FromBody] User userInfo)
+        {
+            var user = await _userRepository.IsAuthentificate(userInfo.UserName, userInfo.Password);
+
+            if (user != null)
+            {
+                var token = CreateToken(userInfo);
+                return Ok(new ResponseResult<UserToken>()
+                {
+                    error = false,
+                    result = new UserToken()
+                    {
+                        UserName = user.UserName,
+                        Token = token,
+                        Role = user.Role
+                    }
+                });
+            }
+            return new UnauthorizedObjectResult(new ResponseError()
+            {
+                error = true,
+                message = "Wrong password or user not exist"
+            });
+        }
+
+        [HttpPost]
+        [Route("testLogin")]
+        public IActionResult LoginTest([FromBody] User userInfo)
         {
             if(IsAuthUser(userInfo))
             {
@@ -80,7 +111,7 @@ namespace RaveCalcApiCommander.Controllers
             SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                claims: claims,
+                claims: claims,                
                 expires: DateTime.Now.AddDays(1),
                 signingCredentials:creds
                 );

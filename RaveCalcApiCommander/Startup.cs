@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using RaveCalcApiCommander.Abstraction;
 using RaveCalcApiCommander.Authorization;
 using RaveCalcApiCommander.Data;
 using RaveCalcApiCommander.GlobalErrorHandling;
@@ -48,12 +49,7 @@ namespace RaveCalcApiCommander
                     ValidateAudience = false
                 };
             });
-            services.AddSingleton<IRaveRepository, MocRaveRepository>();
-            services.AddTransient<IAuthorizationHandler, AuthHandler>();
-            services.AddSingleton<IEmbededResourceService>(c =>
-            {
-                return new MocEmbededResourceService();
-            });
+
             services.AddHttpContextAccessor();
             services.AddControllers();
             services.AddSpaStaticFiles(configuration =>
@@ -70,7 +66,13 @@ namespace RaveCalcApiCommander
             builder.RegisterModule(new DIModule()
             {
                 ConnectionStringConfig = Configuration["MongoDBConfig:ConnectionString"],
-                DatabseNameConfig = Configuration["MongoDBConfig:DatabaseName"]
+                DatabseNameConfig = Configuration["MongoDBConfig:CountryDatabaseName"]
+            });
+
+            builder.RegisterModule(new AutofacDIModule()
+            {
+                ConnectionStringConfig = Configuration["MongoDBConfig:ConnectionString"],
+                DatabseNameConfig = Configuration["MongoDBConfig:UserDatabaseName"]
             });
         }
 

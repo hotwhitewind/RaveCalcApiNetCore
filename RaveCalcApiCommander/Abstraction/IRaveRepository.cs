@@ -1,4 +1,5 @@
-﻿using RaveCalcApiCommander.Models;
+﻿using RaveCalcApiCommander.Data;
+using RaveCalcApiCommander.Models;
 using Stratogos.Jovian.Rave.Charts;
 using Stratogos.Jovian.Rave.Structures;
 using System;
@@ -7,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RaveCalcApiCommander.Data
+namespace RaveCalcApiCommander.Abstraction
 {
     public interface IRaveRepository
     {

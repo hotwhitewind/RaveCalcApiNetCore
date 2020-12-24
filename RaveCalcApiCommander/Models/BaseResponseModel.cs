@@ -27,6 +27,7 @@ namespace RaveCalcApiCommander.Models
     {
         public string UserName { get; set; }
         public string Token { get; set; }
+        public Roles Role { get; set; }
     }
 
     public class DateConvertResult

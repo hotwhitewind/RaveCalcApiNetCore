@@ -81,6 +81,7 @@ namespace RaveCalcApiCommander
             });
         }
 
+        [Authorize]
         [HttpGet]
         [Route("getallstates")]
         public async Task<ActionResult> GetAllStates([FromQuery] StatesQuery query)
