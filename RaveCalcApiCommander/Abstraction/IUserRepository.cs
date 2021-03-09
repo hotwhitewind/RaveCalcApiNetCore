@@ -11,5 +11,8 @@ namespace RaveCalcApiCommander.Abstraction
     {
         public Task<User> GetUser(ObjectId Id);
         public Task<User> IsAuthentificate(string Login, string Password);
+        public Task<bool> SaveRefreshToken(User user, RefreshToken refresh);
+        public Task<bool> RemoveRefreshToken(RefreshToken refresh);
+        public Task<User> CheckRefreshToken(RefreshToken refresh);
     }
 }

@@ -7,7 +7,7 @@ import { City, Country, District, State } from 'src/app/common/model';
 import { NgbDateCustomAdapter, NgbDateCustomParserFormatter } from '../../../filters/dateformat';
 import { FillselectService } from '../../sevices/fillselect.service';
 import { NgbTimeStringAdapter } from 'src/filters/timeformat';
-import { User } from 'src/app/common/authModels';
+import { User, UserLocal } from 'src/app/common/authModels';
 import { AuthenticationService } from 'src/app/sevices/authentication.service';
 
 @Component({
@@ -33,7 +33,7 @@ export class UserdateComponent implements OnInit {
     this._dataForm = value;
   }
 
-  currentUser: User;
+  currentUser: UserLocal;
   countries: string[];
   currentCountry: Country;
   currentCity: City;

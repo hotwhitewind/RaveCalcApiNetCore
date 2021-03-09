@@ -1,4 +1,4 @@
-import { User } from "./authModels";
+import { Tokens, User } from "./authModels";
 import { Country } from "./model";
 
 export class CountriesResponse {
@@ -29,4 +29,9 @@ export class RaveResponse {
 export class UserResponse{
   error: boolean;
   result: User;
+}
+
+export class TokensResponse{
+  error: boolean;
+  result: Tokens;
 }
