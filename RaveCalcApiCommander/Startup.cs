@@ -60,7 +60,8 @@ namespace RaveCalcApiCommander
             services.AddControllers();
             services.AddSpaStaticFiles(configuration =>
             {
-                configuration.RootPath = "wwwroot/dist/RaveCalcApiAngular";
+                //configuration.RootPath = "wwwroot/dist/RaveCalcApiAngular";
+                configuration.RootPath = "../RaveFront/dist/RaveCalcApiAngular";
             });
         }
 
@@ -113,7 +114,7 @@ namespace RaveCalcApiCommander
                 // To learn more about options for serving an Angular SPA from ASP.NET Core,
                 // see https://go.microsoft.com/fwlink/?linkid=864501
 
-                spa.Options.SourcePath = "..\\AngularFront";
+                spa.Options.SourcePath = "../RaveFront";
 
                 if (env.IsDevelopment())
                 {
