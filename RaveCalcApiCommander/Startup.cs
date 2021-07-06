@@ -60,8 +60,7 @@ namespace RaveCalcApiCommander
             services.AddControllers();
             services.AddSpaStaticFiles(configuration =>
             {
-                //configuration.RootPath = "wwwroot/dist/RaveCalcApiAngular";
-                configuration.RootPath = "../RaveFront/dist/RaveCalcApiAngular";
+                configuration.RootPath = "wwwroot/dist/RaveFront";
             });
         }
 
